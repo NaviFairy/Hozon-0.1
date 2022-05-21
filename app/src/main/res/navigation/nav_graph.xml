@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/wellcome_dest"
         android:name="com.alg.hozon_01.WellcomeFragment"
-        android:label="Wellcome"
+        android:label="Inicio"
         tools:layout="@layout/fragment_wellcome">
         <action
             android:id="@+id/action_wellcomeFragment_to_graficosFragment"
