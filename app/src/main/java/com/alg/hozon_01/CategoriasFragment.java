@@ -2,15 +2,11 @@ package com.alg.hozon_01;
 
 import android.os.Bundle;
 
-import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,7 +24,6 @@ import com.alg.hozon_01.CategoriasViewModel;
 
 import java.util.List;
 
-//import hozon_01.R;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,9 +37,10 @@ public class CategoriasFragment extends Fragment {
     private Button btnAnadir;
     private EditText etNuevoCategoria;
 
+
     //Una referencia a categoriasViewModel
     private CategoriasViewModel categoriasViewModel;
-    
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -64,7 +60,7 @@ public class CategoriasFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment CategoriasFragment.
+     * @return A new instance of fragment IngredientesFragment.
      */
     // TODO: Rename and change types and number of parameters
     public static CategoriasFragment newInstance(String param1, String param2) {
@@ -84,21 +80,19 @@ public class CategoriasFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-
         //El owner es un ViewModelStoreOwner que es un objeto con ciclo de vida es decir una Activity o un Fragment
         //en este caso estamos en un Fragment, por eso pasamos this a ViewModelProvider
-        categoriasViewModel = new ViewModelProvider(this).get(CategoriasViewModel.class);
+        categoriasViewModel = new ViewModelProvider(getActivity()).get(CategoriasViewModel.class);
         //Aquí instanciamos por primera vez el ingredientesViewModel, es decir, lo ubicamos en el Fragment
         //Cualquier otra referencia debe acceder a esta instacia de ingredientesViewModel
         //para ello tendrá que pasar a ViewModelProvider una referencia al Fragment.
 
-        //Si la lista de ingredientes no ha sido cargada todavía en el ViewModel (por una ejecución anterior de este fragment, por ejemplo)
-        if (categoriasViewModel.getList().getValue() == null) {
-            String[] theArray = getResources().getStringArray(R.array.categorias_array);
-            categoriasViewModel.initList(theArray);
-        }
+//        //Si la lista de ingredientes no ha sido cargada todavía en el ViewModel (por una ejecución anterior de este fragment, por ejemplo)
+//        if (ingredientesViewModel.getIngredientes().getValue() == null) {
+//            String[] theArray = getResources().getStringArray(R.array.ingredientes_array);
+//            ingredientesViewModel.initList(theArray);
+//        }
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -107,7 +101,7 @@ public class CategoriasFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_categorias, container, false);
     }
 
-
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -137,15 +131,17 @@ public class CategoriasFragment extends Fragment {
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         rvCategorias.setLayoutManager(layoutManager);
-        //En el CategoriassAdapter queremos usar también el categoriasViewModel por eso le pasamos
-        //una referencia a this Fragment, para que pueda ponerla en el ViewModelProvider al instanciarlo
-        categoriasAdapter = new CategoriasAdapter(ECategorias.categoriaDiffCallback,this);
+        //En el IngredientesAdapter queremos usar también el ingredientesViewModel por eso le pasamos
+        //una referencia a la activity, para que pueda ponerla en el ViewModelProvider al instanciarlo
+        categoriasAdapter = new CategoriasAdapter(ECategorias.categoriaDiffCallback,getActivity());
         rvCategorias.setAdapter(categoriasAdapter);
 
-        categoriasViewModel.getList().observe(getViewLifecycleOwner(), new Observer<List<ECategorias>>() {
+
+        categoriasViewModel.ldCategorias.observe(getViewLifecycleOwner(), new Observer<List<ECategorias>>() {
             @Override
-            public void onChanged(List<ECategorias> listaCategorias) {
-                categoriasAdapter.submitList(listaCategorias);
+            public void onChanged(List<ECategorias> categorias) {
+
+                categoriasAdapter.submitList(categorias);
             }
         });
     }

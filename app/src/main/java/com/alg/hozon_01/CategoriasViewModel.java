@@ -1,69 +1,73 @@
 package com.alg.hozon_01;
 
 
+import android.app.Application;
+
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.alg.hozon_01.ECategorias;
+import com.alg.hozon_01.data.CategoriasRepository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class CategoriasViewModel extends ViewModel {
+public class CategoriasViewModel extends AndroidViewModel {
 
-    private MutableLiveData<List<ECategorias>> _theList;
+    private CategoriasRepository categoriasRepository;
 
-    public void initList(String[] arrayCategorias) {
-        List<ECategorias> categoriasList = new ArrayList<ECategorias>();
-        for (int i = 0; i < arrayCategorias.length; i++) {
-            categoriasList.add(new ECategorias(arrayCategorias[i]));
-        }
-        if (_theList == null) {
-            _theList = new MutableLiveData<>();
-        }
-        _theList.setValue(categoriasList);
-        _theList.getValue().sort(ECategorias::compareTo);
+    private static final ExecutorService repositoryExecutor = Executors.newFixedThreadPool(1);
+
+    public MutableLiveData<List<ECategorias>> ldCategorias;
+
+    public CategoriasViewModel(Application application) {
+        super(application);
+        categoriasRepository = new CategoriasRepository(application);
+        ldCategorias = new MutableLiveData<>();
+        repositoryExecutor.execute( () -> {
+            ldCategorias.postValue(categoriasRepository.getAllCategorias());
+        });
     }
 
-    public LiveData<List<ECategorias>> getList() {
-        if (_theList == null) {
-            _theList = new MutableLiveData<>();
-        }
-        return _theList;
+    public void initList(String[] arrayCategorias) {
+        repositoryExecutor.execute( () -> {
+            categoriasRepository.deleteAllCategorias();
+            categoriasRepository.insertCategorias(arrayCategorias);
+            ldCategorias.postValue(categoriasRepository.getAllCategorias());
+        });
+    }
+
+    public void forceDBCreation() {
+        repositoryExecutor.execute( () -> {
+           categoriasRepository.forceDBCreation();
+        });
     }
 
     public void deleteCategoria(int position) {
-        if (_theList.getValue() != null) {
-            List<ECategorias> categoriasList = new ArrayList<>(_theList.getValue());
-            categoriasList.remove(position);
-            _theList.setValue(categoriasList);
-        }
+        String strCategoria = ldCategorias.getValue().get(position).getStrCategoria();
+        repositoryExecutor.execute( () -> {
+           categoriasRepository.deleteCategoria(strCategoria);
+            ldCategorias.postValue(categoriasRepository.getAllCategorias());
+        });
     }
 
     public void addCategoria(ECategorias categoria) {
-        if (_theList.getValue() != null) {
-            List<ECategorias> categoriasList = new ArrayList<>(_theList.getValue());
-            categoriasList.add(categoria);
-            categoriasList.sort(ECategorias::compareTo);
-            _theList.setValue(categoriasList);
-        }
+        repositoryExecutor.execute( () -> {
+            categoriasRepository.insertCategoria(categoria);
+            ldCategorias.postValue(categoriasRepository.getAllCategorias());
+        });
     }
-
-    public void updateCategoria(ECategorias newCategoria, int position) {
-        if (_theList.getValue() != null) {
-            List<ECategorias> categoriasList = new ArrayList<>(_theList.getValue());
-            categoriasList.remove(position);
-            categoriasList.add(position, newCategoria);
-            _theList.setValue(categoriasList);
-        }
-    }
-
-    public boolean findCategoriaByName(String categoriaName) {
+    public boolean findCategoriaByName(String ingredienteName) {
+        //NO necesitamos acceder a la base de datos,
+        //se supone que la lista ldIngredientes esta actualizada
         boolean retVal=false;
-        if (_theList.getValue() != null) {
-            for (ECategorias categoria : _theList.getValue()) {
-                if (categoria.toString().equals(categoriaName)){
+        if (ldCategorias.getValue() != null) {
+            for (ECategorias categoria : ldCategorias.getValue()) {
+                if (categoria.toString().equals(ingredienteName)){
                     retVal = true;
                     break;
                 }
@@ -75,5 +79,6 @@ public class CategoriasViewModel extends ViewModel {
         return retVal;
     }
     //-------------------------------
+
 
 }

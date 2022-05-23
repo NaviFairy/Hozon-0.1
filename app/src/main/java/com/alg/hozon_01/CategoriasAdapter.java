@@ -1,8 +1,5 @@
 package com.alg.hozon_01;
 
-
-import android.app.Application;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,20 +17,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alg.hozon_01.ECategorias;
 import com.alg.hozon_01.CategoriasViewModel;
 
-import java.util.List;
-
-//import hozon_01.R;
-
 public class CategoriasAdapter extends ListAdapter<ECategorias, CategoriasAdapter.CategoriasViewHolder> {
+    // Referencia a la default Factory de la App, a usar cuando el ViewModel no recibe parámetros y usando su constructor por defecto
+    private ViewModelProvider.AndroidViewModelFactory theAppFactory;
 
-    //Declaramos una referencia al categoriasViewModel
+    //Declaramos una referencia al ingredientesViewModel
     private CategoriasViewModel categoriasViewModel;
 
     protected CategoriasAdapter(@NonNull DiffUtil.ItemCallback<ECategorias> diffCallback, ViewModelStoreOwner owner) {
         super(diffCallback);
-        //Instanciamos el categoriasViewModel
+        //Instanciamos el ingredientesViewModel
         //  El segundo parametro que recibimos debe ser el objeto en donde se creo por primera vez el ViewModel
-        //     En este ejemplo es el  CategoriasFragment porque en el se instancia por primera vez
+        //     En este ejemplo es el  IngredientesFragment porque en el se instancia por primara vez
         //  Un (ViewModelStoreOwner) es un objeto con ciclo de vida (una Activity o un Fragment).
         categoriasViewModel = new ViewModelProvider(owner).get(CategoriasViewModel.class);
     }
@@ -62,12 +57,12 @@ public class CategoriasAdapter extends ListAdapter<ECategorias, CategoriasAdapte
     }
 
     public class CategoriasViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvCategoriasItem;
+        private TextView tvCategoriaItem;
         private ImageButton ibDelete;
 
         public CategoriasViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvCategoriasItem = itemView.findViewById(R.id.tvCategoriasItem);
+            tvCategoriaItem = itemView.findViewById(R.id.tvCategoriasItem);
             ibDelete = itemView.findViewById(R.id.ibDelete);
             ibDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -78,8 +73,9 @@ public class CategoriasAdapter extends ListAdapter<ECategorias, CategoriasAdapte
         }
 
         public void bind(String string) {
-            tvCategoriasItem.setText(string);
+            tvCategoriaItem.setText(string);
         }
     }
 
 }
+

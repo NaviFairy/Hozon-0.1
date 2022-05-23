@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private AppBarConfiguration appBarConfiguration;
 
+    private CategoriasViewModel categoriasViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +58,19 @@ public class MainActivity extends AppCompatActivity {
         setupActionBar(navController, appBarConfiguration);
         setupNavigationMenu(navController);
 
+        setupCategoriasViewModel();
+
+        forceDatabaseCreation();
+
     }
 
+    private void setupCategoriasViewModel() {
+        categoriasViewModel = new ViewModelProvider(this).get(CategoriasViewModel.class);
+    }
 
-
+    private void forceDatabaseCreation() {
+        categoriasViewModel.forceDBCreation();
+    }
 
 
     private void setupNavigationMenu(NavController navController) {
